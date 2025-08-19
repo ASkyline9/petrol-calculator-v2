@@ -1,6 +1,7 @@
 {
   "name": "Petrol Usage Calculator Malaysia",
   "short_name": "Petrol Calc",
+  "version": "0.9.0",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#00903B",
