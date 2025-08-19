@@ -97,13 +97,35 @@ document.addEventListener('DOMContentLoaded', () => {
             entriesToRender.reverse().forEach(entry => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-gray-50';
+
+                let photoCell = '';
+                if (entry.receiptPhoto) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-10 h-10 object-cover rounded-md';
+                        const cell = row.querySelector('.receipt-cell');
+                        if (cell) {
+                            cell.innerHTML = ''; // Clear 'Loading...' text
+                            cell.appendChild(img);
+                        }
+                    };
+                    reader.readAsDataURL(entry.receiptPhoto);
+                    photoCell = `<td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500 receipt-cell">Loading...</td>`;
+                } else {
+                    photoCell = `<td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500 receipt-cell">No Photo</td>`;
+                }
+
                 row.innerHTML = `
                     <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">${entry.date}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${entry.mileageReading} KM</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">RON ${entry.fuelType}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">RM ${entry.litersPrice}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${entry.kmPerRM}</td>
+                    ${photoCell}
                 `;
+
                 historyBody.appendChild(row);
             });
         };
