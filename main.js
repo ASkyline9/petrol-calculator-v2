@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let db;
 
     // Open the IndexedDB database
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, 2); // Version updated to 2
 
     request.onerror = (event) => {
         console.error('Database error:', event.target.errorCode);
@@ -37,8 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyBody = document.getElementById('history-body');
     const resetHistoryBtn = document.getElementById('reset-history');
     const viewAllHistoryBtn = document.getElementById('view-all-history');
-    // New DOM element for receipt photo
-    const receiptPhotoInput = document.getElementById('receipt-photo');
+    const receiptPhotoInput = document.getElementById('receipt-photo'); // New DOM element
 
     // Default prices based on West Malaysia data (from HTML)
     const defaultPrices = {
@@ -146,6 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const litersPrice = parseFloat(litersPriceInput.value);
         const ron = pumpRonSelect.value;
         const durationDays = durationDaysInput.value;
+        
+        // Get the photo file from the input
+        const receiptPhotoFile = receiptPhotoInput.files[0];
 
         // Calculate
         const kmPerRm = calculateFuelEfficiency(mileage, pumpAmount);
@@ -172,7 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
             litersPrice: litersPrice,
             pumpAmount: pumpAmount,
             durationDays: durationDays,
-            kmPerRM: kmPerRm
+            kmPerRM: kmPerRm,
+            // Add the receipt photo to the entry
+            receiptPhoto: receiptPhotoFile
         };
 
         // Save and re-render history
@@ -207,23 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadHistory();
     });
 
-    // New Event Listener for receipt photo
-    receiptPhotoInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                console.log('Photo captured successfully.');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
     // Initial page load
     updatePriceInput();
 });
 
-// Add this code to the very top of your main.js file
+// Service Worker Registration
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
