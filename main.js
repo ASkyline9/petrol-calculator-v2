@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyBody = document.getElementById('history-body');
     const resetHistoryBtn = document.getElementById('reset-history');
     const viewAllHistoryBtn = document.getElementById('view-all-history');
+    // New DOM element for receipt photo
+    const receiptPhotoInput = document.getElementById('receipt-photo');
 
     // Default prices based on West Malaysia data (from HTML)
     const defaultPrices = {
@@ -203,6 +205,18 @@ document.addEventListener('DOMContentLoaded', () => {
     viewAllHistoryBtn.addEventListener('click', () => {
         fullHistoryMode = true;
         loadHistory();
+    });
+
+    // New Event Listener for receipt photo
+    receiptPhotoInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                console.log('Photo captured successfully.');
+            };
+            reader.readAsDataURL(file);
+        }
     });
 
     // Initial page load
