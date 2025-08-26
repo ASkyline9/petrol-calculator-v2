@@ -58,11 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to calculate fuel efficiency
     function calculateFuelEfficiency(mileage, pumpAmount) {
+        // Guard against division by zero or invalid input
+        if (pumpAmount === 0 || isNaN(pumpAmount)) {
+            return 'N/A';
+        }
         return (mileage / pumpAmount).toFixed(2);
     }
 
     // Function to save an entry to the database
     function saveEntry(entry) {
+        if (!db) {
+            console.error('Database not open. Cannot save entry.');
+            return;
+        }
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const objectStore = transaction.objectStore(STORE_NAME);
         const request = objectStore.add(entry);
@@ -79,13 +87,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to load and display history
     function loadHistory() {
+        if (!db) {
+             console.warn('Database not yet open for history load. Retrying in 500ms...');
+             setTimeout(loadHistory, 500); // Retry loading history after a short delay
+             return;
+        }
+
         historyBody.innerHTML = ''; // Clear existing rows
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const objectStore = transaction.objectStore(STORE_NAME);
+        // Retrieve all entries and sort by date descending
         const request = objectStore.getAll();
 
         request.onsuccess = (event) => {
             let entries = event.target.result;
+            // Sort entries by ID descending to get the most recent first
+            entries.sort((a, b) => b.id - a.id);
 
             if (entries.length > 5 && !fullHistoryMode) {
                 viewAllHistoryBtn.style.display = 'block';
@@ -93,13 +110,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewAllHistoryBtn.style.display = 'none';
             }
 
-            const entriesToRender = fullHistoryMode ? entries : entries.slice(-5);
-            entriesToRender.reverse().forEach(entry => {
+            const entriesToRender = fullHistoryMode ? entries : entries.slice(0, 5); // Display top 5 or all
+            
+            entriesToRender.forEach(entry => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-gray-50';
 
                 let photoCell = '';
                 if (entry.receiptPhoto) {
+                    // Assuming receiptPhoto is a File object or Blob stored directly
+                    // It needs to be converted to a Data URL to be displayed
+                    // This logic might need adjustment if how the photo is stored changes
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const img = document.createElement('img');
@@ -111,8 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             cell.appendChild(img);
                         }
                     };
-                    reader.readAsDataURL(entry.receiptPhoto);
-                    photoCell = `<td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500 receipt-cell">Loading...</td>`;
+                    // Ensure entry.receiptPhoto is a Blob or File object to be read
+                    if (entry.receiptPhoto instanceof Blob || entry.receiptPhoto instanceof File) {
+                        reader.readAsDataURL(entry.receiptPhoto);
+                        photoCell = `<td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500 receipt-cell">Loading...</td>`;
+                    } else {
+                        // Handle cases where photo might be a Data URL string already (e.g., if re-loaded from string)
+                        photoCell = `<td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500 receipt-cell"><img src="${entry.receiptPhoto}" class="w-10 h-10 object-cover rounded-md"></td>`;
+                    }
                 } else {
                     photoCell = `<td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500 receipt-cell">No Photo</td>`;
                 }
@@ -168,12 +195,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const ron = pumpRonSelect.value;
         const durationDays = durationDaysInput.value;
         
-        // Get the photo file from the input
+        // --- ADDED INPUT VALIDATION ---
+        if (isNaN(mileage) || isNaN(pumpAmount) || isNaN(litersPrice) || isNaN(durationDays) ||
+            mileage <= 0 || pumpAmount <= 0 || litersPrice <= 0 || durationDays < 0) { // Added checks for positive values
+            alert("Please fill in all fields with valid positive numbers.");
+            return; // Stop execution if validation fails
+        }
+        // --- END INPUT VALIDATION ---
+
         const receiptPhotoFile = receiptPhotoInput.files[0];
 
         // Calculate
         const kmPerRm = calculateFuelEfficiency(mileage, pumpAmount);
-        const totalLiters = (pumpAmount / litersPrice).toFixed(2);
+        const totalLiters = (litersPrice !== 0 && !isNaN(litersPrice)) ? (pumpAmount / litersPrice).toFixed(2) : 'N/A';
 
         // Display results
         kmPerRmDisplay.textContent = `${kmPerRm} KM per RM`;
@@ -197,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
             pumpAmount: pumpAmount,
             durationDays: durationDays,
             kmPerRM: kmPerRm,
-            // Add the receipt photo to the entry
             receiptPhoto: receiptPhotoFile
         };
 
@@ -214,7 +247,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset history button
     resetHistoryBtn.addEventListener('click', () => {
+        // IMPORTANT: Custom modal should be used instead of alert()/confirm() in Canvas environment.
+        // For now, using confirm() as per existing user code pattern.
         if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+            if (!db) {
+                console.error('Database not open. Cannot clear history.');
+                return;
+            }
             const transaction = db.transaction([STORE_NAME], 'readwrite');
             const objectStore = transaction.objectStore(STORE_NAME);
             const clearRequest = objectStore.clear();
@@ -223,6 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('History cleared successfully.');
                 loadHistory(); // Reload to show empty table
                 resultsDiv.classList.add('hidden');
+            };
+
+            clearRequest.onerror = (event) => {
+                console.error('Error clearing history:', event.target.error);
             };
         }
     });
