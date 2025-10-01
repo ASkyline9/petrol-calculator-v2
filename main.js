@@ -249,9 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Default prices based on West Malaysia data (from HTML)
     const defaultPrices = {
-        '95': 2.05,
-        '97': 3.47,
-        'Diesel': 2.15
+        '95': 2.60,
+	'BUDI95': 1.99,
+        '97': 3.21,
+        'Diesel': 2.93
     };
 
     let fullHistoryMode = false;
