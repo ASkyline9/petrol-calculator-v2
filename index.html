@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="Petrol Usage Calculator">
-    <meta property="og:description" content="Calculate and track your vehicle's fuel consumption and efficiency in Malaysia.">
+    <meta property="og:description" content="Calculate and track your vehicle's fuel consumption and efficiency in Malaysia with BUDI95 petrol subsidy.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://askyline9.github.io/petrol-calculator-v2/">
     <meta property="og:image" content="https://askyline9.github.io/petrol-calculator-v2/assets/petronas-logo.png">
@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="/assets/petronas-logo.png">
-    <meta name="description" content="Calculate and track your vehicle's fuel consumption and efficiency in Malaysia. Save your petrol usage history and receipt photos.">
+    <meta name="description" content="Calculate and track your vehicle's fuel consumption and efficiency in Malaysia. Save your petrol usage history and receipt photos. Now with BUDI95 petrol calculation">
     
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4071724251256256" crossorigin="anonymous"></script>
 </head>
@@ -41,19 +41,19 @@
     <main class="p-4 md:p-8 max-w-2xl mx-auto">
         
         <div class="bg-white p-4 rounded-lg shadow-md mb-6">
-            <h2 class="text-xl font-semibold mb-2 text-[#00903B]">Current Petrol Prices (West Malaysia, September 2025)</h2>
+            <h2 class="text-xl font-semibold mb-2 text-[#00903B]">Current Petrol Prices (West Malaysia, October 2025)</h2>
             <div class="flex justify-around text-center">
                 <div>
                     <p class="font-bold">RON 95</p>
-                    <p class="text-lg" id="price-ron95">RM 2.05</p>
+                    <p class="text-lg" id="price-ron95">RM 2.60/L (RM1.99 BUDI95)</p>
                 </div>
                 <div>
                     <p class="font-bold">RON 97</p>
-                    <p class="text-lg" id="price-ron97">RM 3.47</p>
+                    <p class="text-lg" id="price-ron97">RM 3.21/L</p>
                 </div>
                 <div>
                     <p class="font-bold">Diesel</p>
-                    <p class="text-lg" id="price-diesel">RM 2.15</p>
+                    <p class="text-lg" id="price-diesel">RM 2.93/L</p>
                 </div>
             </div>
             <p class="text-xs text-gray-500 mt-2 text-center">*Prices are for reference only. Manual input is required for custom prices.</p>
@@ -73,6 +73,7 @@
                     <label for="pumpRon" class="block text-sm font-medium text-gray-700">Pump RON</label>
                     <select id="pumpRon" name="pumpRon" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 focus:ring-[#00903B] focus:border-[#00903B]">
                         <option value="95">RON 95</option>
+			<option value="95">RON 95 BUDI95</option>
                         <option value="97">RON 97</option>
                         <option value="Diesel">Diesel</option>
                     </select>
@@ -80,7 +81,7 @@
 
                 <div>
                     <label for="litersPrice" class="block text-sm font-medium text-gray-700">Price per liter (RM)</label>
-                    <input type="number" id="litersPrice" name="litersPrice" placeholder="e.g., 2.05" step="0.01" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 focus:ring-[#00903B] focus:border-[#00903B]" required>
+                    <input type="number" id="litersPrice" name="litersPrice" placeholder="e.g., 2.60" step="0.01" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 focus:ring-[#00903B] focus:border-[#00903B]" required>
                 </div>
 
                 <div>
